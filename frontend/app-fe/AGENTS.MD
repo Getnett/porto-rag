@@ -29,7 +29,7 @@ cd frontend/app-fe
 ### Install dependencies
 
 ```bash
-pnpm add
+pnpm install
 ```
 
 Do not switch package managers unless explicitly requested.
@@ -337,9 +337,9 @@ src/components/upload/UploadForm.test.tsx
 Run the relevant checks:
 
 ```bash
-npm run lint
-npm run test
-npm run build
+pnpm run lint
+pnpm run test
+pnpm run build
 ```
 
 A frontend task should be considered complete only when:
