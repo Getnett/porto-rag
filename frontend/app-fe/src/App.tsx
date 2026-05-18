@@ -1,12 +1,13 @@
+import { RouterProvider } from '@tanstack/react-router'
 
-import './App.css'
+import { appRouter, type AppRouter } from './router'
 
-function App() {
-  return (
-    <>
-      Rag Admin  Ingestion Tool
-    </>
-  )
+type AppProps = {
+  router?: AppRouter
+}
+
+function App({ router = appRouter }: AppProps) {
+  return <RouterProvider router={router} />
 }
 
 export default App

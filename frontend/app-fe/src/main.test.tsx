@@ -12,6 +12,6 @@ describe('main entrypoint', () => {
 
     await import('./main')
 
-    expect(await screen.findByText(/rag admin\s+ingestion tool/i)).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /overview/i })).toBeInTheDocument()
   })
 })
