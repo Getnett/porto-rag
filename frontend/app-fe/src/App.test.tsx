@@ -1,12 +1,36 @@
+import { createMemoryHistory } from '@tanstack/react-router'
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import App from './App'
+import { createAppRouter } from './router'
 
 describe('App', () => {
-  it('renders the ingestion tool title', () => {
-    render(<App />)
+  it('renders the overview route inside the admin shell', async () => {
+    const router = createAppRouter()
+    router.update({
+      history: createMemoryHistory({ initialEntries: ['/'] }),
+    })
 
-    expect(screen.getByText(/rag admin\s+ingestion tool/i)).toBeInTheDocument()
+    render(<App router={router} />)
+
+    expect(await screen.findByRole('heading', { name: /overview/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /coming soon/i })).toBeInTheDocument()
+    expect(screen.getByRole('navigation', { name: /primary navigation/i })).toBeInTheDocument()
+  })
+
+  it('renders routed pages from sidebar links', async () => {
+    const router = createAppRouter()
+    router.update({
+      history: createMemoryHistory({ initialEntries: ['/ingestion'] }),
+    })
+
+    render(<App router={router} />)
+
+    expect(await screen.findByRole('heading', { name: /ingestion/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /ingestion/i })).toHaveAttribute(
+      'aria-current',
+      'page'
+    )
   })
 })
