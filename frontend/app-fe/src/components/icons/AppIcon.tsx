@@ -1,23 +1,37 @@
 import {
+  Bell,
+  Bot,
+  BookOpenText,
+  ChevronDown,
+  ChevronRight,
+  House,
+  MessageSquareText,
+  Settings,
+  UploadCloud,
   type LucideIcon,
 } from 'lucide-react'
 
-import * as LucideIcons from 'lucide-react'
-export type LucideIconName = keyof typeof LucideIcons
+const appIcons = {
+  bell: Bell,
+  bot: Bot,
+  knowledgeBase: BookOpenText,
+  chevronDown: ChevronDown,
+  chevronRight: ChevronRight,
+  conversations: MessageSquareText,
+  ingestion: UploadCloud,
+  overview: House,
+  settings: Settings,
+
+} satisfies Record<string, LucideIcon>
+
+export type AppIconName = keyof typeof appIcons
 
 type AppIconProps = {
-  name: LucideIconName
+  name: AppIconName
 } & React.ComponentProps<LucideIcon>
 
 export function AppIcon({ name, ...props }: AppIconProps) {
-   	const IconComponent = LucideIcons[name as LucideIconName] as
-		| LucideIcon
-		| undefined;
+  const Icon = appIcons[name]
 
-    if(!IconComponent) {
-      console.warn(`Icon "${name}" not found in LucideIcons.`)
-      return null
-    }
-
-  return <IconComponent {...props}  />
+  return <Icon aria-hidden="true" {...props} />
 }
