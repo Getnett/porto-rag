@@ -8,8 +8,9 @@ import {
   MessageSquareText,
   Settings,
   UploadCloud,
+  Trash2,
   type LucideIcon,
-} from 'lucide-react'
+} from "lucide-react";
 
 const appIcons = {
   bell: Bell,
@@ -21,17 +22,18 @@ const appIcons = {
   ingestion: UploadCloud,
   overview: House,
   settings: Settings,
+  upload: UploadCloud,
+  remove: Trash2,
+} satisfies Record<string, LucideIcon>;
 
-} satisfies Record<string, LucideIcon>
-
-export type AppIconName = keyof typeof appIcons
+export type AppIconName = keyof typeof appIcons;
 
 type AppIconProps = {
-  name: AppIconName
-} & React.ComponentProps<LucideIcon>
+  name: AppIconName;
+} & React.ComponentProps<LucideIcon>;
 
 export function AppIcon({ name, ...props }: AppIconProps) {
-  const Icon = appIcons[name]
+  const Icon = appIcons[name];
 
-  return <Icon aria-hidden="true" {...props} />
+  return <Icon aria-hidden="true" {...props} />;
 }
