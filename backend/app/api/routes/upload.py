@@ -23,14 +23,11 @@ def generate_upload_signed_url(object_name:Annotated[str,Path(description="The n
     try:
         # Get your BASE credentials (your user account)
         # This automatically uses your active identity (ADC)
+       
         credentials, project = google.auth.default()
-        print(f"Service Account Email: {credentials.service_account_email}")
-        print(f"Token: {credentials.token}")
-        print(f"Project ID: {project}")
-    
+       
         # Manually create the Impersonated Credentials
         # This bypasses any weirdness in the gcloud CLI state
-       
         target_creds = impersonated_credentials.Credentials(
         source_credentials=credentials,
         target_principal= credentials.service_account_email, # The service account email to impersonate (same as your user account)
