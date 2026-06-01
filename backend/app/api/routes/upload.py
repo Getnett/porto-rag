@@ -1,6 +1,6 @@
 from typing import Annotated
 from datetime import timedelta
-from fastapi import APIRouter, FastAPI,Path,HTTPException
+from fastapi import APIRouter, FastAPI,HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 import google.auth
@@ -13,36 +13,27 @@ from core.config import settings
 
 router = APIRouter()
     
-@router.get("/upload-signed-url/{object_name}")
-def generate_upload_signed_url(object_name:Annotated[str,Path(description="The name of the object to be uploaded")]):
+@router.get("/upload-signed-url")
+def generate_upload_signed_url(file_name:Annotated[str,Query(description="The name of the file to be uploaded")]):
     """ 
       Generate a signed URL for uploading an object to the cloud storage.
-      - **object_name**: The name of the object to be uploaded.
-      Returns a signed URL that can be used to upload the object to the cloud storage.    
+      - **file_name**: The name of the file to be uploaded.
+      Returns a signed URL that can be used to upload the file to the cloud storage.    
     """
     try:
         # Get your BASE credentials (your user account)
         # This automatically uses your active identity (ADC)
-       
         credentials, project = google.auth.default()
        
-        # Manually create the Impersonated Credentials
-        # This bypasses any weirdness in the gcloud CLI state
-        target_creds = impersonated_credentials.Credentials(
-        source_credentials=credentials,
-        target_principal= credentials.service_account_email, # The service account email to impersonate (same as your user account)
-        target_scopes=["https://www.googleapis.com/auth/cloud-platform"]
-        )
-    
         #Refresh to get the token
-        target_creds.refresh(Request())
+        credentials.refresh(Request())
         
 
         # Initialize the Google Cloud Storage client
-        client = storage.Client(credentials=target_creds, project=project)
+        client = storage.Client(credentials=credentials, project=project)
 
         bucket = client.bucket(settings.GCS_BUCKET_NAME) # This should be set in the .env file and accessed via os.environ
-        blob = bucket.blob("uploads/" + object_name) # You can customize the path as needed
+        blob = bucket.blob("uploads/" + file_name) # You can customize the path as needed
        
 
         # Generate a signed URL for uploading the object
@@ -51,8 +42,8 @@ def generate_upload_signed_url(object_name:Annotated[str,Path(description="The n
             expiration=timedelta(minutes=15), 
             method="PUT", 
             content_type="application/octet-stream",
-            service_account_email=target_creds.service_account_email,
-            access_token=target_creds.token
+            service_account_email=settings.GOOGLE_IMPERSONATE_SERVICE_ACCOUNT,
+            access_token=credentials.token
             
             ) # URL valid for 15 minutes
              

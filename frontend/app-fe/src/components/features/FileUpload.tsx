@@ -21,7 +21,8 @@ const uppy = new Uppy({
     ],
   },
   onBeforeFileAdded: (file, files) => {
-    console.log("Attempting to add file:", file);
+    const MAX_FILES = 8;
+    const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // 100MB
     const ALLOWD_FILE_TYPES = [
       "application/pdf",
       "text/markdown",
@@ -30,10 +31,12 @@ const uppy = new Uppy({
       "text/html",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     ];
-    const filesToUpload = Object.values(files);
+    const existingFiles = Object.values(files);
+
+    const totalFileCount = existingFiles.length + 1;
 
     // Check total number of files being uploaded
-    if (files && Object.values(files).length > 8) {
+    if (totalFileCount > MAX_FILES) {
       toast.error("You can only upload up to 8 files at a time.", {
         position: "top-right",
         style: { backgroundColor: "red", color: "white" },
@@ -41,17 +44,22 @@ const uppy = new Uppy({
       return false; // Prevent the upload
     }
 
+    const existingFilesSize = existingFiles.reduce(
+      (total, existingFile) => total + (existingFile.size ?? 0),
+      0,
+    );
+
+    const totalSize = existingFilesSize + (file.size ?? 0);
+
     // Check total file size of all files being uploaded
-    if (filesToUpload && filesToUpload.length > 0) {
-      const fileSize = filesToUpload.reduce((acc, file) => acc + file?.size, 0);
-      if (fileSize > 100 * 1024 * 1024) {
-        toast.error("Total file size exceeds the 100MB limit.", {
-          position: "top-right",
-          style: { backgroundColor: "red", color: "white" },
-        });
-        return false; // Prevent the upload
-      }
+    if (totalSize > MAX_TOTAL_SIZE) {
+      toast.error("Total file size exceeds the 100MB limit.", {
+        position: "top-right",
+        style: { backgroundColor: "red", color: "white" },
+      });
+      return false; // Prevent the upload
     }
+
     // Check if the file type is allowed
     if (file.type && !ALLOWD_FILE_TYPES.includes(file.type)) {
       toast.error(`File type not allowed: ${file.type}`, {
@@ -67,8 +75,14 @@ const uppy = new Uppy({
   shouldUseMultipart: false,
   async getUploadParameters(file) {
     try {
+      const baseUrL = import.meta.env.VITE_API_BASE_URL;
+
+      const params = new URLSearchParams({
+        file_name: file.name,
+      });
+
       const response = await fetch(
-        `http://127.0.0.1:8000/api/upload-signed-url/${file.name}`,
+        `${baseUrL}/upload-signed-url?${params.toString()}`,
       );
       if (!response.ok) {
         throw new Error(`Failed to fetch signed URL: ${response.status}`);
