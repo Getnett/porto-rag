@@ -1,0 +1,11 @@
+# Local environment
+.env
+.venv/
+
+# Python generated files
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Editor directories and files
+.idea/
