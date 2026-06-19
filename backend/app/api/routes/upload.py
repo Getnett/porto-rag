@@ -1,7 +1,7 @@
 from typing import Annotated
 from datetime import timedelta
-from fastapi import APIRouter, FastAPI,HTTPException, Query
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import APIRouter,HTTPException, Query
+
 
 import google.auth
 from google.auth import impersonated_credentials
@@ -24,11 +24,10 @@ def generate_upload_signed_url(file_name:Annotated[str,Query(description="The na
         # Get your BASE credentials (your user account)
         # This automatically uses your active identity (ADC)
         credentials, project = google.auth.default()
-       
+        
         #Refresh to get the token
         credentials.refresh(Request())
-        
-
+                
         # Initialize the Google Cloud Storage client
         client = storage.Client(credentials=credentials, project=project)
 
