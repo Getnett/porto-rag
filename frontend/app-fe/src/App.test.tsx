@@ -33,4 +33,20 @@ describe('App', () => {
       'page'
     )
   })
+
+  it('renders the auth page outside the admin shell', async () => {
+    const router = createAppRouter()
+    router.update({
+      history: createMemoryHistory({ initialEntries: ['/auth'] }),
+    })
+
+    render(<App router={router} />)
+
+    expect(await screen.findByRole('heading', { name: /prepare, index/i })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: /sign in/i })).toHaveAttribute(
+      'aria-selected',
+      'true'
+    )
+    expect(screen.queryByRole('navigation', { name: /primary navigation/i })).not.toBeInTheDocument()
+  })
 })

@@ -1,7 +1,19 @@
-import { Link, Outlet, useRouterState } from "@tanstack/react-router";
+import {
+  Link,
+  Outlet,
+  useRouter,
+  useRouterState,
+} from "@tanstack/react-router";
 
 import { AppIcon, type AppIconName } from "@/components/icons/AppIcon";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { signOut } from "@/lib/supabaseClient";
 
 type NavigationItem = {
   label: string;
@@ -44,11 +56,25 @@ const navigationItems: NavigationItem[] = [
 ];
 
 export function AppShell() {
+  // const [signingOut, setSigningOut] = useState(false);
+  const router = useRouter();
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
+
+  if (pathname.startsWith("/login")) {
+    return <Outlet />;
+  }
+
   const currentNavigationItem =
     navigationItems.find((item) => item.to === pathname) ?? navigationItems[0];
+
+  const handleLogout = async () => {
+    // setSigningOut(true);
+    await signOut();
+    // await router.navigate({ to: "/login" });
+    // setSigningOut(false);
+  };
 
   return (
     <div className="min-h-screen bg-[#f8faf9] text-slate-950">
@@ -119,16 +145,33 @@ export function AppShell() {
               <AppIcon name="bell" className="size-5" />
             </button>
 
-            <button
-              className="flex items-center gap-2 text-sm font-medium"
-              type="button"
-            >
-              <span className="flex size-8 items-center justify-center rounded-full bg-[#043c3b] text-xs font-semibold text-white">
-                A
-              </span>
-              <span>Admin</span>
-              <AppIcon name="chevronDown" className="size-4 text-slate-500" />
-            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className="flex items-center gap-2 rounded-md px-2 py-1 text-sm font-medium transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950/20"
+                  type="button"
+                >
+                  <span className="flex size-8 items-center justify-center rounded-full bg-[#043c3b] text-xs font-semibold text-white">
+                    A
+                  </span>
+                  <span>Admin</span>
+                  <AppIcon
+                    name="chevronDown"
+                    className="size-4 text-slate-500"
+                  />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  className="text-red-600 focus:bg-red-50 focus:text-red-700"
+                  onSelect={handleLogout}
+                  // disabled={signingOut}
+                >
+                  <AppIcon name="logOut" className="size-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
 
