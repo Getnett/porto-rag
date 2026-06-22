@@ -17,8 +17,8 @@ origins = ["http://localhost:5173"]
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state["jwks_lock"] = asyncio.Lock()
-    app.state["jwks_cache"] = TTLCache(maxsize=1, ttl=600)
+    app.state.jwks_lock = asyncio.Lock()
+    app.state.jwks_cache = TTLCache(maxsize=2, ttl=600)
     await get_jwks(app.state.jwks_lock, app.state.jwks_cache)  # warm cache at startup
     yield
 

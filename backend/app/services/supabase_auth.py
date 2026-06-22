@@ -78,7 +78,7 @@ async def verify_jwt(token: str,_jwks_lock:asyncio.Lock | None,_jwks_cache:TTLCa
         # Could mean: key not in JWKS yet (just rotated), or a forged token.
         # Busting the cache and retrying once handles the rotation race condition.
         _jwks_cache.clear()
-        jwks = await get_jwks()
+        jwks = await get_jwks(_jwks_lock,_jwks_cache)
         public_key = find_public_key(token, jwks)
 
         if not public_key:
